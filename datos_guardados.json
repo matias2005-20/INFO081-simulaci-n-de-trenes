@@ -1,0 +1,25 @@
+{
+    "rutas": [
+        "ruta 1",
+        "ruta 2",
+        "ruta 4"
+    ],
+    "estaciones": [
+        "Estaci\u00f3n Central",
+        "Rancagua",
+        "Talca",
+        "Chill\u00e1n"
+    ],
+    "trenes": [
+        {
+            "nombre": "Tren BMU",
+            "ruta": "ruta 1",
+            "estacion": "Estaci\u00f3n Central"
+        },
+        {
+            "nombre": "Tren EMU \u2013 EFE SUR",
+            "ruta": "ruta 3",
+            "estacion": "Estaci\u00f3n Central"
+        }
+    ]
+}

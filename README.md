@@ -17,3 +17,6 @@ El archivo simulacion 1.5.py contiene el bloque if __name__ == "__main__": y act
 Posteriormente, el programa carga ui/menu.py, que gestiona la interfaz gráfica y la ejecución de los módulos secundarios.
 
 El archivo se debe iniciar en “simulacion 1.5.py”, donde, al presionar el botón “Iniciar”, se abrirá el menú principal. En este menú se podrán crear y mostrar datos de los distintos momentos de simulación mediante la opción “Crear”.
+
+
+# Cuando se abre la selección de tren, ruta o estación, puede aparecer una opción marcada por defecto. Para actualizar la lista y dejar todo sin seleccionar, solo presione cualquier opción nuevamente.
