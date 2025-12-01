@@ -20,3 +20,5 @@ El archivo se debe iniciar en “simulacion 1.5.py”, donde, al presionar el bo
 
 
 # Cuando se abre la selección de tren, ruta o estación, puede aparecer una opción marcada por defecto. Para actualizar la lista y dejar todo sin seleccionar, solo presione cualquier opción nuevamente.
+
+el boton mostras info solo sale despues de apretar crear no es nesesario crear 
