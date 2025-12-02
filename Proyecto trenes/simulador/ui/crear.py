@@ -22,10 +22,10 @@ class GenerarTrenes:
             self.tren[i] = [f'pasajero_{j+1}' for j in range(pasajeros)]
 
     def mostrar_tren(self):  # mostrar
-        i = 1  # 
+        i= 1   
         for vag in self.tren:
             print(f'Vagon {i}:', vag)
-            i += 1
+            i+= 1
 
 
 
@@ -33,29 +33,36 @@ def crear_estacion(ventanafaz):
     ventana_estacion = tk.Toplevel(ventanafaz)
     ventana_estacion.title("Crear estacion")
     ventana_estacion.geometry("300x250")  
-
     tk.Label(ventana_estacion, text= "Nombre de la estacion:").pack(pady =  5)
     texto=tk.Text(ventana_estacion, height = 2, width=30)
     texto.pack(pady = 5)
-
     #numero de vias
     tk.Label(ventana_estacion, text="Número de vias:").pack(pady =5)
     vias=tk.Entry(ventana_estacion)
     vias.pack(pady=5)
 
     def guardar_estacion():
-        nombre= texto.get("1.0","end-1c")
-        vias=vias.get()  
-        if nombre.strip() and vias.isdigit():  
+        try:
+            nombre=texto.get("1.0","end-1c")
+            vias_valor=vias.get()
+            if not nombre.strip():
+                raise ValueError("Sin nombre")
+
+            if not vias_valor.isdigit():
+                raise ValueError("nombre Invalido")  
+            if int(vias_valor) < 1:
+                raise ValueError("Deben existir vias, almenos 1")  
+            vias_int = int(vias_valor)
             estacion ={  #volvemos estacion como un diccionario
                 "nombre": nombre.strip(),
-                "vias": int(vias),       
-                "vias_ocupadas": []      
-            }
+                "vias": vias_int,       
+                "vias_ocupadas": []}
             estaciones_guardadas.append(estacion)  
             print("Estaciones guardadas: ", estaciones_guardadas)
+        except Exception as e:  
+            print("Error no se pudo crear la estacion", e)  
+            return 
         ventana_estacion.destroy()
-
     tk.Button(ventana_estacion, text="Guardar estación", command = guardar_estacion).pack(pady=10)
 
 
@@ -68,10 +75,17 @@ def crear_ruta(ventanafaz):
     texto.pack(pady=5)
 
     def guardar_ruta():
-        nombre=texto.get("1.0", "end-1c")
-        if nombre.strip():
+        try:
+            nombre = texto.get("1.0", "end-1c")
+            if not nombre.strip():
+                raise ValueError("ruta sin nombre")  
+            if nombre.strip() in rutas_guardadas:
+                raise ValueError("La ruta ya esta creada")
             rutas_guardadas.append(nombre.strip())
             print("Rutas guardadas:", rutas_guardadas)
+        except Exception as e:  
+            print("Error no se pudo crear la ruta", e)  
+            return 
         ventana_ruta.destroy()
     tk.Button(ventana_ruta, text="Guardar ruta", command=guardar_ruta).pack(pady=10)
 
@@ -123,47 +137,69 @@ def crear_tren(ventanafaz):
     if estacion_puntito: 
         estacion_puntito.trace_add("write", actualizar_vias)  
     actualizar_vias()  #iniciar
-
-    #generador como objeto #
+    #generador como objeto 
     tren_generado = GenerarTrenes(vagones=5, capacidad=20)  
     tren_generado.llenar_tren()  #llenamos con pasajeros 
 
     def mostrar_texto():
-        nombre = nombre_text.get("1.0", "end-1c")
+        try:
+            nombre=nombre_text.get("1.0", "end-1c")
+            if not nombre.strip():
+                raise ValueError("Tren sin nombre")  
+            ruta_sel =ruta_puntito.get() if ruta_puntito else None
+            if not ruta_sel:
+                raise ValueError("se debe seleccionar un tren") 
+            estacion_nombre= estacion_puntito.get() if estacion_puntito else None
+            if not estacion_nombre:
+                raise ValueError("se debe seleccionar una estacion")  
+            via_valor = via_puntito.get()
+            if not via_valor:
+                raise ValueError("Se debe seleccionar una vía")  
+            try:
+                via_sel = int(via_valor)
+            except:
+                raise ValueError("La via no se pudo seleccionar")
+            estacion=None
+            for ess in estaciones_guardadas:
+                if ess["nombre"] == estacion_nombre:
+                    estacion = ess
+                    break
+            if estacion and via_sel in estacion["vias_ocupadas"]:
+                raise ValueError("La via esta ocupada") 
+        except Exception as e:  
+            print("ERROR al crear tren:", e) 
+            return
+
+
+
         print("Nombre:", nombre)
         #seleccio
         ruta_sel=ruta_puntito.get() if ruta_puntito else None
-        estacion_sel_nombre =estacion_puntito.get() if estacion_puntito else None
+        estacion_nombre =estacion_puntito.get() if estacion_puntito else None
         via_sel= int(via_puntito.get()) if via_puntito.get() else None  
-
         if ruta_sel:
             print("Ruta:", ruta_sel)
-        if estacion_sel_nombre:
-            print("Estación:", estacion_sel_nombre)
+        if estacion_nombre:
+            print("Estación:", estacion_nombre)
         if via_sel:
             print("Vía asignada:", via_sel)  
-
-        
         print("Pasajeros generados por vagón:")  
         tren_generado.mostrar_tren()  
 
         #guardar tren
         if nombre.strip():
-            tren = {
-                "nombre": nombre.strip(),
+            tren = {"nombre": nombre.strip(),
                 "ruta": ruta_sel,
-                "estacion": estacion_sel_nombre,
+                "estacion": estacion_nombre,
                 "via": via_sel,
-                "pasajeros": tren_generado.tren  
-            }
+                "pasajeros": tren_generado.tren }
             trenes_guardados.append(tren)
             #en caso de estar ocupado
-            if estacion_sel_nombre and via_sel:
-                estacion = next((est for est in estaciones_guardadas if est["nombre"] == estacion_sel_nombre), None)
+            if estacion_nombre and via_sel:
+                estacion = next((est for est in estaciones_guardadas if est["nombre"] == estacion_nombre), None)
                 if estacion:
                     estacion["vias_ocupadas"].append(via_sel)
             print("Trenes:", trenes_guardados)  
 
         ventana_tren.destroy()
-
     tk.Button(ventana_tren, text="Mostrar datos", command=mostrar_texto).pack(pady=10)

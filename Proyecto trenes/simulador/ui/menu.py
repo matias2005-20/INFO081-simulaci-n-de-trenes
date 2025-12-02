@@ -1,7 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from config import titulo, alto, ancho
-
 from datos import rutas_guardadas, estaciones_guardadas, trenes_guardados
 from ui.eliminar import eliminar_tren, eliminar_ruta, eliminar_estacion
 from ui.crear import crear_estacion, crear_ruta, crear_tren
@@ -18,11 +17,13 @@ def guardar_datos():
     datos={
         "rutas": rutas_guardadas,
         "estaciones": estaciones_guardadas,
-        "trenes": trenes_guardados} #datos en diccionarios por el json 
-
-    with open("datos_guardados.json", "w", encoding  = "utf-8") as f:
-        json.dump(datos, f, indent=4)  
-    print("Los datos se han guardado.")
+        "trenes": trenes_guardados}
+    try:   
+        with open("datos_guardados.json", "w", encoding  = "utf-8") as f:
+            json.dump(datos, f, indent=4)
+        print("Los datos se guardaron.")
+    except Exception as e:  
+        print("Error al guardar:", e)
 
 
 def cargar_datos():
@@ -33,30 +34,28 @@ def cargar_datos():
         # guardar los datos y lipia datos
         rutas_guardadas.clear()
         rutas_guardadas.extend(datos.get("rutas", []))
-
+        print("Rutas:", rutas_guardadas)
         estaciones_guardadas.clear()
         estaciones_guardadas.extend(datos.get("estaciones", []))
-
+        print("Estaciones:", estaciones_guardadas)
         trenes_guardados.clear()
         trenes_guardados.extend(datos.get("trenes", []))
-
-        print("Datos cargados.")
-        print("Rutas:", rutas_guardadas)
-        print("Estaciones:", estaciones_guardadas)
         print("Trenes:", trenes_guardados)
-
+        print("Datos cargados.")
     except FileNotFoundError:
-        print("No existen archivos por ahora (datos_guardados.json).")
+        print("No existen archivos que cargar).")
+    except json.JSONDecodeError:   
+        print("El archivo esta corrompido.")
+    except Exception as e:   
+        print("Error  cargar:", e)
 
 
 def eliminar_elemento():
-    
+
     ventana_eliminar = tk.Toplevel(ventanafaz)
-    # al toplevel le cambie la variable a ventanafaz para que esa sea la principal y no tener una ventana suelta por ahi
     ventana_eliminar.title("Eliminar elemento")
     ventana_eliminar.geometry("300x200")
-
-    tk.Button(ventana_eliminar, text="Eliminar tren",
+    tk.Button(ventana_eliminar, text= "Eliminar tren",
               command =lambda: eliminar_tren(ventanafaz)).pack(pady = 10)
     tk.Button(ventana_eliminar, text="Eliminar ruta",
               command= lambda: eliminar_ruta(ventanafaz)).pack(pady = 10)
@@ -82,8 +81,9 @@ def abrir_menu(ventanain):
         fondo = tk.Label(ventanafaz, image=imagen_tk)
         fondo.image = imagen_tk
         fondo.place(x=0, y=0, relwidth=1, relheight=1)
-    except Exception:
-        print("No se pudo cargar la imagen 'mmmmmmm.png'.")
+    except Exception:      
+        print("No se cargo 'mmmmmmm.png'.")
+
 
    
     tk.Button(ventanafaz, text="Crear", command=ventana_crear_opciones).place(x=20, y=20)
@@ -94,9 +94,13 @@ def abrir_menu(ventanain):
     tk.Button(ventanafaz, text="EMERGENCIA", fg="red", command=emergencia).place(x=20, y=220)
 
     #reloj 
-    reloj = Reloj(ventanafaz, x=ancho-120, y=20)
+    try:   
+        reloj = Reloj(ventanafaz, x=ancho-120, y=20)
+    except Exception as e:   
+        print("no se pudo crear el reloj:", e)
 
     ventanafaz.mainloop()
+
 
 def ventana_crear_opciones():
     ventana_op = tk.Toplevel(ventanafaz)
